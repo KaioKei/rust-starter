@@ -1,0 +1,9 @@
+[toolchain]
+# which toolchain to use (check with `rustup toolchain list`)
+channel = "stable"
+# The profile setting names a group of components to be installed. The value is a string.
+# The valid options are: minimal, default, and complete.
+# check the documentation to learn more about the profiles
+# Note that if not specified, the default profile is not necessarily used, as a different default profile might
+# have been set with rustup set profile.
+profile = "default"
