@@ -5,12 +5,22 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+# 'bin' sections define binaries to compile
+# each one of the following will be built with 'cargo build --bins'
 [[bin]]
-name = "hello-world"
+name = "hello"
 path = "src/main.rs"
-
 [[bin]]
 name = "variables"
 path = "src/tuto/variables/main.rs"
+[[bin]]
+name = "functions"
+path = "src/tuto/functions/main.rs"
+[[bin]]
+name = "control_flow"
+path = "src/tuto/control_flow/main.rs"
+[[bin]]
+name = "ownership"
+path = "src/tuto/ownership/main.rs"
 
 [dependencies]
