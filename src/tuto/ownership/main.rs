@@ -132,6 +132,9 @@ fn main() {
     // for the life of that reference.
     // For example, a 'reference' of a string is a variable only holding the pointer part of the
     // string, composed with a pointer, a length and a capacity.
+    // In the following example ;
+    // - 's1' is a variable of type 'String'
+    // - 'r1' is a variable of type '&String' (reference type to a string)
     let s1 = String::from("hello");
     let r1 = &s1;
     println!("Printing the string using its reference: {r1}");
@@ -146,72 +149,97 @@ fn main() {
     println!("So I can still use this string in the current scope : {s1}"); // s1 still valid in this context
 
     // MUTABLE REFERENCES
-    // Just like other variables, references are immutable :
-    let s1 = String::from("hello");
-    let s2 = String::from(", world !");
-    let r1 = &s1; // works as expected
-    //r1 = &s2; // does not work because r1 is immutable
-    // let's use a mutable reference :
-    let mut r2 = &s1;
-    r2 = &s2; // works because r2 was declared mutable
-    println!("Printing a string through its mutable reference: {r2}");
-
-    // IMMUTABLE VAR OF A REFERENCE VS IMMUTABLE REFERENCE VS IMMUTABLE VAR
-    let si = String::from("immutable");
-    let mut sm = String::from("mutable");
-    // this is an immutable variable of a immutable reference to an immutable variable, i.e. you :
-    //   - cannot change 'r' to point somewhere else than 'si' (immutable)
-    //   - cannot change the 'si' value using this reference 'r' (immutable)
-    //   - cannot change the 'si' value (immutable)
-    let r = &si;
-    // this is an immutable variable of an immutable reference to a mutable variable, i.e. you :
-    //   - cannot change 'r' to point somewhere else than 'sm' (immutable)
-    //   - cannot change the 'si' value using this reference 'r' (immutable)
-    //   - can change the 'sm' value (mutable) and you cannot do it using this reference anyway
-    let r = &sm;
-    // this is a mutable variable of an immutable reference to a mutable variable, i.e. you :
-    //   - can change 'r' to point somewhere else than 'sm' (mutable)
-    //   - cannot change the 'sm' value using this reference 'r' (immutable)
-    //   - can change the 'sm' value (mutable) but you cannot do it using this reference
-    let mut r = &sm;
-    // this is an immutable variable of a mutable reference to a mutable variable, i.e. you :
-    //   - cannot change 'r' to point somewhere else than 'sm' (immutable)
-    //   - can change the 'sm' value using this reference 'r' (mutable)
-    //   - can change the 'sm' value (mutable) and you can do it using this reference
-    let r = &mut sm;
-    // this a mutable variable of a mutable reference to a mutable variable, i.e. you :
-    //   - can change 'r' to point somewhere else than 'sm' (mutable)
-    //   - can change the 'sm' value using this reference 'r' (mutable)
-    //   - can change the 'sm' value (mutable) and you can do it using this reference
-    let mut r = &mut sm;
-    // this is a mutable variable of an immutable reference to an immutable variable, i.e. you :
-    //   - can change 'r' to point somewhere else than 'si' (mutable)
-    //   - cannot change the 'si' value using this reference 'r' (immutable)
-    //   - cannot change the 'si' value (mutable) and you cannot do it using this reference anyway
-    let mut r = &si;
-    // NOT POSSIBLE : this is an immutable variable of a mutable reference to an immutable variable
-    // You cannot use a mutable reference to an immutable variable
-    // otherwise it would assume that you can modify an immutable variable -> nonsense to Rust
-    // let r = &mut si; // impossible
-    // let mut r = &mut si; // impossible
-
+    // They are expressed as '&mut' and points to a type of variable that is mutable.
     // the following example modifies a mutable string, using a mutable reference.
     // Borrowing the string into the 'modify' function induces 2 things :
     //   1. Since we have to modify the string, the string MUST BE mutable
     //   2. String we use borrowing, the reference MUST BE mutable
-    let mut s = String::from("hello");
+    let mut s :String = String::from("hello");
     modify(&mut s);
     println!("The string was modified using its reference : {s}");
 
+    // WARNING : a mutable reference can be held by an immutable variable.
+    // Example :
+    let mut s :String = String::from("hello");
+    let r :&mut String = &mut s; // 'r' is immutable but hold the mutable reference of 's'
+    // Indeed, you can hold an immutable String in a mutable reference.
+    // It means that the variable cannot hold anything else than this mutable reference.
+    // For example, the following raises an error :
+    //r = &s2;
+    // In the other hand, you can have a mutable variable of an immutable reference.
+    // Example :
+    let mut r2 :&String = &s1; // 'r2' is mutable, but not 's1' pointed by '&s1'
+    r2 = &s2; // works because r2 was declared mutable. 's2' is also immutable.
+
+    // IMMUTABLE VAR OF REFERENCE VS IMMUTABLE REFERENCE VS IMMUTABLE VAR
+    let si :String = String::from("immutable");
+    let mut sm :String = String::from("mutable");
+    // this is an immutable variable of an immutable reference to an immutable variable, i.e. you :
+    //   - cannot change 'r' for something else than the reference '&si' (immutable)
+    //   - cannot change the 'si' value using this reference ('&' immutable)
+    //   - cannot change the 'si' value (immutable)
+    let r :&String = &si;
+    // this is an immutable variable of an immutable reference to a mutable variable, i.e. you :
+    //   - cannot change 'r' for something else than the reference '&sm' (immutable)
+    //   - cannot change the 'si' value using this reference ('&' immutable)
+    //   - can change the 'sm' value (mutable) but you cannot do it using this reference
+    let r :&String = &sm;
+    // this is a mutable variable of an immutable reference to a mutable variable, i.e. you :
+    //   - can change 'r' for something else than the reference '&sm' (mutable)
+    //   - cannot change the 'sm' value using this reference ('&' immutable)
+    //   - can change the 'sm' value (mutable) but you cannot do it using this reference
+    let mut r :&String = &sm;
+    // this is an immutable variable of a mutable reference to a mutable variable, i.e. you :
+    //   - cannot change 'r' for something else than the reference '&sm' (immutable)
+    //   - can change the 'sm' value using this reference ('&mut' mutable)
+    //   - can change the 'sm' value (mutable) and you can do it using this reference
+    let r :&mut String = &mut sm;
+    // this a mutable variable of a mutable reference to a mutable variable, i.e. you :
+    //   - can change 'r' for something else than the reference '&sm' (mutable)
+    //   - can change the 'sm' value using this reference ('&mut' mutable)
+    //   - can change the 'sm' value (mutable) and you can do it using this reference
+    let mut r :&mut String = &mut sm;
+    // this is a mutable variable of an immutable reference to an immutable variable, i.e. you :
+    //   - can change 'r' for something else than the reference '&si' (mutable)
+    //   - cannot change the 'si' value using this reference ('&' immutable)
+    //   - cannot change the 'si' value (mutable) and you cannot do it using this reference
+    let mut r :&String = &si;
+    // NOT POSSIBLE : this is an immutable variable of a mutable reference to an immutable variable
+    // You cannot use a mutable reference to an immutable variable
+    // otherwise it would assume that you can modify an immutable variable -> nonsense to Rust
+    // let r :&mut String = &mut si; // impossible
+    // let mut r :&mut String = &mut si; // impossible
+
     // !! WARNING !!
-    // YOU CANNOT HAVE MORE THAN ONE REFERENCE TO A MUTABLE VALUE.
-    // The following example raises an error :
-    //let r1 = &s2;
-    //let r2= &s2;
+    // A MUTABLE REFERENCE CANNOT BE BORROWED TWICE IN THE SAME SCOPE
+    // A MUTABLE REFERENCE CANNOT BE BORROWED IF AN IMMUTABLE REFERENCE OF THE SAME VAR IS HELD BY ANOTHER VARIABLE
+    // It is because Rust prevents data races at compile time when :
+    //   - Two or more pointers access the same data at the same time.
+    //   - At least one of the pointers is being used to write to the data.
+    //   - There’s no mechanism being used to synchronize access to the data.
+    // For example, the following example raises an error :
+    //let r1 :&mut String = &mut s2;
+    //let r2 :&mut String = &mut s2; // same mutable reference held by another variable = error
+    // For example, the following also raises an error :
+    //let r1 :&String = &s;
+    //let r2 :&mut String = &mut s; // same reference but mutable, already held by r1 = error
+    // Otherwise, immutable references can be held by more than one variable :
+    let r1 :&String = &s;
+    let r2 :&String = &s; // same reference held by another variable = OK, because it is read-only
+    // The following works because references 'r1' and 'r2' are dropped by the 'println' function :
+    println!("{r1} and {r2}");
+    let r3 :&mut String = &mut s;
 
-
-
-
+    // DANGLING REFERENCE
+    // A Dangling reference is a reference where the data goes out of scope before the reference.
+    // It is dangerous : it suggests that the data is out of scope while its reference is owned.
+    // Rust prevents dangling references at compile-time, so it will raise an error.
+    // Example of a function that creates dangling reference :
+    //let dangling_reference :&String = dangle(); // the reference is borrowed here
+    //fn dangle() -> &String {
+    //    let s = String::from("hello");
+    //    &s
+    //} // here the data of 's' is dropped, but not its reference, borrowed in the upper scope -> error
 
 } // end of the main function scope. All variables are no longer valid and their memory are returned to the allocator.
 
@@ -251,3 +279,4 @@ fn this_fn_doesnt_take_ownership(s: &String) {
 fn modify(s: &mut String) {
     s.push_str(", world !");
 }
+

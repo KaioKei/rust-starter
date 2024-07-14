@@ -159,7 +159,6 @@ fn main() {
     println!();
 
     // STRING
-    // CHECK 'OWNERSHIP' COURSE LEARN HOW MEMORY STACK AND HEAP WORK WITH RUST :
     // 'String' type and string literals 'str' are heap-based data, but they behave differently.
     // 'str' is an immutable sequence of UTF-8 bytes of dynamic length somewhere in the heap.
     //   Use it when you do not need to own or modify your string data.
@@ -200,6 +199,45 @@ fn main() {
     //   - ../../../ownership.md
     //   - ../ownership/main.rs
 
+    // SLICES
+    // READ OWNERSHIP TUTORIAL BEFORE LEARNING ABOUT SLICES
+    // Slices let you reference a contiguous sequence of elements in a collection rather than the
+    // whole collection.
+    // A slice is a kind of reference, so it does not have ownership : it borrows the elements from
+    // the initial collection.
+    // A slice is noted [starting_index..ending_index] where :
+    //   - starting_index is the first position in the slice
+    //   - ending_index is ONE MORE THAT THE LAST POSITION IN THE SLICE !
+
+    // STRING SLICES
+    // Since slices are references, a String Slice is an immutable reference to a 'str' type.
+    // It means that a String Slice variable only contains a pointer and a length :
+    //   - The pointer is equal to the address of the byte starting the substring
+    //   - The length is equal to the length of the substring
+    // String slices are a good way to deal with substrings.
+    // Example of String Slices :
+    let s = String::from("hello world");
+    let hello :&str = &s[..5]; // slice references the 4 first elements "hello" (0 to 4th)
+    let world :&str = &s[6..]; // slice references the 5 last elements "world" (6th to 11th)
+    println!("Frist slice is '{hello}'"); // move hello into println
+    println!("Second slice is '{world}'"); // move world into println
+    // 's' is still available in the scope !
+
+    // INTEGER SLICE
+    let x = [1, 2, 3, 4, 5];
+    let slice :&[i32] = &x[1..3]; // 2nd to 3rd element [2, 3]
+    assert_eq!(slice, &[2, 3]);
+
+    // TIPS ON SLICE
+    // It sometimes useful to use a Slice instead of an array of elements.
+    // Because it allows to use them as reference instead of arrays of values, avoiding moves.
+    // Example :
+    let my_string = String::from("hello world !");
+    let my_slice = &my_string[..]; // this slice contains all the elements of the original string
+    println!("The whole string is '{my_slice}'"); // borrows the string instead of moving it into println
+    let first_word = first_word(my_slice); // borrows the slice into the function
+    println!("The first word is : '{first_word}'"); // moves first_word into println
+
 
 
     // VECTOR
@@ -208,4 +246,18 @@ fn main() {
 
 
 
+}
+
+// first_word finds the first words in a string if the elements are separated by a whitespace
+// this function takes a slice as an argument, because it is more convenient
+// because strings are easily convertible into slices
+fn first_word(rs: &str) -> &str {
+    let bytes = rs.as_bytes();
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' { // if a whitespace is found
+            return &rs[..i]; // returns the slice of the substring before the whitespace
+        }
+    }
+
+    &rs[..] // otherwise, there is no whitespace -> return the whole slice
 }
