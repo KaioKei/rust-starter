@@ -11,6 +11,14 @@ Learn about the basis of Rust and how it manages the memory :
 
 - [Rust Ownership Concepts](./ownership.md)
 
+Learn advanced practices :
+
+- [Learn Rust with practical, production-tested guides](https://www.howtocodeit.com/articles)
+
+Search engine for error codes, crates, docs, etc :
+
+- [Query RS](https://query.rs/)
+
 ## Install Rust
 
 It is recommended to install Rust with `rustup` :

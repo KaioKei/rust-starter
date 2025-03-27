@@ -49,7 +49,14 @@ fn main() {
     let x = 1;
     let y = 2;
     let result = my_addition(x, y);
-    println!("'{} + {} = {}'", x, y, result)
+    println!("'{} + {} = {}'", x, y, result);
+
+    // The variable holding the result defines the mutability of the result, but not the function :
+    let immutable_result = my_addition(1, 2);
+    let mut mutable_result = my_addition(1, 2);
+    mutable_result = 5;
+    println!("The immutable result is: {immutable_result}");
+    println!("The mutable result was changed to: {mutable_result}");
 }
 
 // Rust does not care where you define your functions.
@@ -68,7 +75,10 @@ fn get_five() -> u8 {
 
 // Take parameters.
 // Returns a value.
-// The return value of the function is synonymous with the value of the final expression in the block of the body of a function.
+// The returned value is either mutable or immutable, the function doesn't define this behavior.
+// It is the variable holding the result that defines the mutability of the result.
+// The return value of the function is synonymous with the value of the final expression in the
+// block of the body of a function.
 // Most functions return the last expression implicitly
 // You can return early from a function by using the return keyword and specifying a value
 fn my_addition(x: i32, y: i32) -> i32 {

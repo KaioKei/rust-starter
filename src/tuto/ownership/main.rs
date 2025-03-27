@@ -1,6 +1,7 @@
 use std::ffi::OsString;
 
 //https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html
+//https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html
 fn main() {
     println!("Ownership tutorial.");
 
@@ -54,12 +55,20 @@ fn main() {
     // THE DATA ITSELF IS NOT COPIED !!!
     // In other words, 's1' and 's2' are 2 different objects on top of the stack
     // ('s2' on top of 's1'), but point to the same data in the heap :
+    //   - address_s1 = address_s2
+    //   - length_s1 = length_s2
+    //   - capacity_s1 = capacity_s2
+    //   - s1 != s2 on the stack !
     let s1 = String::from("hello");
     let s2 = s1;
     // SO THERE IS A PROBLEM :
     // When Rust will call the 'drop' function when 's1' and 's2' are getting out of scope,
     // Rust will try to free the same memory location twice.
-    // Therefore, Rust implements a security that invalidate 's1' after 'let s2 = s1;'.
+    // Therefore, Rust implements a security that invalidate 's1' after 'let s2 = s1;', by
+    // implementing the feature 'copy' to heap-based variables.
+    // In other words, Rust :
+    //   - use 'copy' from 's1' to 's2'
+    //   - invalidates 's1' in this scope
     // In this case, Rust does not have to free 's1' anymore, but it is also unusable in this scope.
     // This process in Rust is called 'move'. We say that 's1' was 'moved'.
     // For example, the following code does not compile because 's1' was moved to 's2' :
@@ -69,9 +78,11 @@ fn main() {
     // to deeply copy the heap data of the String, not just the stack data, we can use a
     // method called "clone".
     // In this example, the heap data DOES get copied.
-    // It means that a new pointer is created for 's2', and its length and capacity are inherited from 's1'.
-    // Finally, the data of 's1' is copied to the location referenced by the pointer of 's2' in the heap.
-    // Cloning is more expensive than simply copying the variable in memory consumption perspective,
+    // It means that a new pointer is created for 's2', and its length and capacity are inherited
+    // from 's1'.
+    // Finally, the data of 's1' is copied to the location referenced by the pointer of 's2' in the
+    // heap.
+    // Clone is more expensive than copy of the variable, in memory consumption perspective,
     // because it involves more operations from the memory allocator and more memory heap usage
     let s1 = String::from("hello");
     let s2 = s1.clone(); // cloning s1 to s2
@@ -235,11 +246,11 @@ fn main() {
     // It is dangerous : it suggests that the data is out of scope while its reference is owned.
     // Rust prevents dangling references at compile-time, so it will raise an error.
     // Example of a function that creates dangling reference :
-    //let dangling_reference :&String = dangle(); // the reference is borrowed here
-    //fn dangle() -> &String {
-    //    let s = String::from("hello");
-    //    &s
-    //} // here the data of 's' is dropped, but not its reference, borrowed in the upper scope -> error
+    let dangling_reference :&String = dangle(); // the reference is borrowed here
+    fn dangle() -> &String {
+       let s = String::from("hello");
+       &s
+    } // here the data of 's' is dropped, but not its reference, borrowed in the upper scope -> error
 
 } // end of the main function scope. All variables are no longer valid and their memory are returned to the allocator.
 
@@ -279,4 +290,3 @@ fn this_fn_doesnt_take_ownership(s: &String) {
 fn modify(s: &mut String) {
     s.push_str(", world !");
 }
-

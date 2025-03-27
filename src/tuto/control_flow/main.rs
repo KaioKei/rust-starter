@@ -117,5 +117,50 @@ fn main() {
     for element in (1..4).rev() {
         println!("{}", element);
     }
-    println!("LIFTOFF!!")
+    println!("LIFTOFF!!");
+
+    // ------------------------------
+    // MATCH
+    // Match that allows you to compare a value against patterns.
+    // The match control flow is divided into 2 or more 'arms'.
+    // An arm has two parts: a pattern to compare and a code to execute.
+    // Patterns can be made up of literal values, variable names, wildcards, etc...
+    // The match compares the resultant value against the pattern of each arm, in order.
+    // The first pattern the value “fits” executes the associated code block in the match 'arm'.
+    // the resultant value of the expression in the matching arm is the value that gets returned
+    // for the entire match expression.
+    let coin: &str = "heads";
+    match coin {
+        "heads" => {
+            println!("You can write many lines of code before any result in this match arm");
+            println!("Anyway ...");
+            println!("You win !");
+        },
+        "tails" => {
+            println!("You loose ...");
+        },
+        _ => {
+            // default behavior
+            // no tails or heads
+            println!("Levitating ???");
+        },
+    }
+    // a match control flow can also return a value :
+    let result: &str = match_game(coin);
+    println!("Result of the game: {}", result);
+
+}
+
+fn match_game(coin_result: &str) -> &str {
+    // match control flow also returns value
+    // the match result can be returned as the function result
+    match coin_result {
+        "heads" => "You win !",
+        "tails" => "You loose ...",
+        _ => {
+            // default behavior
+            // no tails or heads
+            "Levitating ???"
+        },
+    }
 }

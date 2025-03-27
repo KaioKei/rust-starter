@@ -1,11 +1,12 @@
 // https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html
 // https://doc.rust-lang.org/book/ch03-02-data-types.html
 // https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html (for strings)
+//https://doc.rust-lang.org/book/ch04-03-slices.html
 fn main() {
 
     // ------------------------------
     // VARIABLES
-    // Rust code uses snake case as the conventional style for names
+    // Rust code uses SNAKE CASE as the conventional style for names
     // they are immutable by default
     // they cannot be changed by the code
     let immutable_variable = 1;
@@ -120,6 +121,7 @@ fn main() {
     let c: char = '🚀';
     println!("Rocket science ! {c}");
 
+    // ------------------------------
     // COMPOUND TYPES
     // They can group multiple values into one type.
     // Rust has two primitive compound types:
@@ -158,6 +160,7 @@ fn main() {
     for x in only_zeros { print!("{x},")}; print!("]");
     println!();
 
+    // ------------------------------
     // STRING
     // 'String' type and string literals 'str' are heap-based data, but they behave differently.
     // 'str' is an immutable sequence of UTF-8 bytes of dynamic length somewhere in the heap.
@@ -199,15 +202,19 @@ fn main() {
     //   - ../../../ownership.md
     //   - ../ownership/main.rs
 
+    // ------------------------------
     // SLICES
     // READ OWNERSHIP TUTORIAL BEFORE LEARNING ABOUT SLICES
+    //   - ../../../ownership.md
+    //   - ../ownership/main.rs
     // Slices let you reference a contiguous sequence of elements in a collection rather than the
     // whole collection.
     // A slice is a kind of reference, so it does not have ownership : it borrows the elements from
     // the initial collection.
     // A slice is noted [starting_index..ending_index] where :
-    //   - starting_index is the first position in the slice
-    //   - ending_index is ONE MORE THAT THE LAST POSITION IN THE SLICE !
+    //   - starting_index = the first position in the slice
+    //   - ending_index = ending_index = last position in the slice - 1
+    //     ONE MORE THAT THE LAST POSITION IN THE SLICE !
 
     // STRING SLICES
     // Since slices are references, a String Slice is an immutable reference to a 'str' type.
@@ -215,9 +222,11 @@ fn main() {
     //   - The pointer is equal to the address of the byte starting the substring
     //   - The length is equal to the length of the substring
     // String slices are a good way to deal with substrings.
+    // Since they are immutable references to a 'str' type, you can define as many slices as you
+    // want from the same string (see ownership for mutable vs immutable references).
     // Example of String Slices :
     let s = String::from("hello world");
-    let hello :&str = &s[..5]; // slice references the 4 first elements "hello" (0 to 4th)
+    let hello :&str = &s[..5]; // slice references the 4 first elements "hello" (0 to 4(=5-1))
     let world :&str = &s[6..]; // slice references the 5 last elements "world" (6th to 11th)
     println!("Frist slice is '{hello}'"); // move hello into println
     println!("Second slice is '{world}'"); // move world into println
@@ -229,14 +238,16 @@ fn main() {
     assert_eq!(slice, &[2, 3]);
 
     // TIPS ON SLICE
-    // It sometimes useful to use a Slice instead of an array of elements.
-    // Because it allows to use them as reference instead of arrays of values, avoiding moves.
+    // It sometimes useful to use a Slice of a full array instead of an array of elements.
+    // Because it allows you to use them as reference instead of arrays of values, avoiding moves.
     // Example :
     let my_string = String::from("hello world !");
     let my_slice = &my_string[..]; // this slice contains all the elements of the original string
-    println!("The whole string is '{my_slice}'"); // borrows the string instead of moving it into println
-    let first_word = first_word(my_slice); // borrows the slice into the function
+    println!("The whole string is my slice :'{my_slice}'"); // borrows the string instead of moving it into println
+    let first_word = first_word(my_slice); // borrows the slice into the function, very convenient
     println!("The first word is : '{first_word}'"); // moves first_word into println
+
+
 
 
 
