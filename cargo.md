@@ -53,6 +53,23 @@ cargo build --bin hello-world --release
 
 The binaries will be located in `target/release`.
 
+### Run
+
+Run binaries using the cargo environment (**recommended**):
+
+```sh
+cargo run --bin hello
+```
+
+Or run using the binaries directly :
+
+```sh
+# debug builds
+./target/debug/hello
+# release builds
+./target/release/hello
+```
+
 ## Clean
 
 To remove all the targets (built binaries) :

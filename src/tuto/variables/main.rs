@@ -162,25 +162,35 @@ fn main() {
 
     // ------------------------------
     // STRING
-    // 'String' type and string literals 'str' are heap-based data, but they behave differently.
-    // 'str' is an immutable sequence of UTF-8 bytes of dynamic length somewhere in the heap.
-    //   Use it when you do not need to own or modify your string data.
-    //   Since the size is unknown, you can only handle it behind a pointer. They are fast and
-    //   efficient because we know the contents at compile time, so the text is hardcoded directly
-    //   into the final executable.
+    // FIRST READ "HEAP vs STACK vs RODATA" (and not more) in :
+    //    - ../../ownership.md
+    //
+    // 'String' type and string literals 'str' behave differently.
+    // 'str' is an immutable sequence of UTF-8 bytes of unpredictable length somewhere in memories (stack, heap or static).
+    // Indeed, &str can point to any location of the memory, to a data 'str' that can be mutable or immutable, static or dynamic.
+    // However, &str is stored onto the stack.
+    // Indeed, a reference is always the same number of bytes (usually 4 or 8 depending on the computer).
     // 'String' is a mutable heap string type, like 'Vec': use it when you need to own or modify
     //   your string data. It allows to allocate an amount of memory in the heap, unknown at compile
     //   time, to hold the contents. Then String dereferences to a &str view of the String's data.
     //   It is made of 3 parts :
-    //     - a pointer to the memory that holds the content
-    //     - a length : how much the contents of the string is currently using, in bytes
-    //     - a capacity : total amount of the usable memory for the string, in bytes.
+    //     - a pointer to the heap that holds the content, stored onto the stack
+    //     - a length : how much the contents of the string is currently using, in bytes, stored onto the stack
+    //     - a capacity : total amount of the usable memory for the string, in bytes, stored onto the stack
     //          The allocator fixes it.
-    // IN OTHER WORDS : USE 'str' FOR IMMUTABLE DATA AND 'String' FOR MUTABLE ONES TO BE OWNED.
+    // In fact, you can consider a 'String' as a container for a 'str' that is stored in the heap,
+    // while &str is simply a reference to a data somewhere.
     let s1: String = String::from("hello");
-    let s2: &str = "world";
+    // points to a string data in the heap :
+    let s1_ref: &str = s1.as_str();
+    // points to a string in static memory :
+    let s2: &str = "world !";
     println!("'String' type: {}", s1);
-    println!("'str' type: {}", s2);
+    println!("'str' type to heap: {}", s1_ref); // same value as s1
+    println!("'str' type to static memory: {}", s2);
+
+    // NOW READ MORE ABOUT STACK VS HEAP VS STATIC for strings in :
+    //   - ../ownership/main.rs
 
     // The following expression explains what happens when you create a 'String' from a 'str'.
     // The double colon :: operator allows us to namespace the variable. This operator says that
@@ -194,13 +204,8 @@ fn main() {
     let immutable_str: &str = "hello";
     let mut s = String::from(immutable_str);
     s.push_str(", world !"); // appends a literal to a String.
-    println!("Mutated String view of the stack : '{}'", s); // but the stack view remains the same
-    println!("Stack view didn't changed : '{}'", immutable_str);
-
-    // FOR MORE INFORMATION ABOUT STRING
-    // Read :
-    //   - ../../../ownership.md
-    //   - ../ownership/main.rs
+    println!("Mutated String view of the static memory : '{}'", s); // but the static data remains the same
+    println!("Static data didn't changed : '{}'", immutable_str);
 
     // ------------------------------
     // SLICES

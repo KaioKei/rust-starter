@@ -1,6 +1,30 @@
 # Rustup
 
+Use rustup to set the toolchain you want to use for development.
+
+You can check the official rustup documentation : https://rust-lang.github.io/rustup/basics.html
+
+## Concepts
+
+Rustup installs **toolchains**.  
+A “toolchain” is a complete installation of the Rust compiler (rustc) and related tools (like cargo).
+
+Rustup has 3 **channels** :
+- stable: sets the last stable toolchain
+- beta: sets the last pre-stable toolchain
+- nightly: sets the last toolchain in development 
+
+
+
+
 ## Install a toolchain
+
+Update Rustup :
+
+```sh
+rustup self update
+rustup update
+```
 
 To install a toolchain and change a rustc version :
 
@@ -11,6 +35,8 @@ rustup toolchain install stable
 rustup toolchain install nightly
 # specific previous version
 rustup toolchain install 1.76.0
+# list the installed toolchains
+rustup toolchain list
 ```
 
 Show current toolchain :
@@ -37,6 +63,13 @@ stable-x86_64-unknown-linux-gnu (default)
 rustc 1.78.0 (9b00956e5 2024-04-29)
 ```
 
+Show current Rust compiler version installed by Rustup :
+
+```sh
+rustc --version
+#> rustc 1.78.0
+```
+
 ## Change the toolchain
 
 Set the toolchain :
@@ -44,6 +77,12 @@ Set the toolchain :
 ```sh
 # Set the default toolchain of the system to 'stable'
 rustup default stable
+```
+
+You can check what version the current channels are pointing to with :
+
+```sh
+rustup check
 ```
 
 Use `override` to set a local toolchain in a directory :
@@ -56,7 +95,15 @@ rustup show active-toolchain
 # list
 rustup override list
 /tmp/test    1.76.0-x86_64-unknown-linux-gnu
-# Remove a local toolchain for a directory
+# check it under the /tmp/test folder
+rustc --version
+#> rustc 1.76.0
+```
+
+You can remove a local toolchain with : 
+
+```sh
+cd /tmp/test
 rustup override unset
 ```
 

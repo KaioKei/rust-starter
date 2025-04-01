@@ -36,7 +36,7 @@ Read my [Rustup Guide](rustup.md).
 
 Read the [official documentation](https://rust-lang.github.io/rustup/)
 
-## Build
+## Build & Run
 
 Cargo is Rust’s build system and package manager.  
 Cargo handles a lot of tasks for you, such as building your code, downloading the libraries your code depends on, and building those libraries.
@@ -44,23 +44,6 @@ Cargo handles a lot of tasks for you, such as building your code, downloading th
 Read my [Cargo Guide](cargo.md).
 
 Read the [official documentation](https://doc.rust-lang.org/cargo/)
-
-### Run
-
-Run binaries using the cargo environment (**recommended**):
-
-```sh
-cargo run --bin hello
-```
-
-Or run using the binaries directly :
-
-```sh
-# debug builds
-./target/debug/hello
-# release builds
-./target/release/hello
-```
 
 ## Troubleshooting
 

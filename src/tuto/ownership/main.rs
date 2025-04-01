@@ -12,60 +12,87 @@ fn main() {
     // SCOPE
     // the variable 's' is valid as long as it is in the current scope, i.e. from the moment it is
     //  declared to the end of the scope.
+    // Basically, the current scope ends at the main's function closing curly bracket '}'.
     // When a variable goes out of scope, Rust calls a special function for us.
     // This function is called drop, and it’s where the author of String can put the code to return
     // the memory. Rust calls drop automatically at the closing curly bracket.
     let s = "hello";
 
-    // FIRST READ HOW STRING WORK IN :
+    // FIRST READ HEAP VS STACK VS RODATA IN :
+    //  - ../../ownership.md
+
+    // NOW FIRST READ HOW STRING WORK IN :
     //  - ../variables/main.rs
 
-    // HEAP VS STACK
-    // Scalar types have a known size at compile time are stored entirely on the stack.
-    // The following example pushes a byte array onto the stack, and then gets a view of that data
-    // as a &str using the heap :
+    // HEAP vs STACK vs RODATA with an example
+    // Scalar types have a known size at compile time, so they are stored entirely on the stack.
+    // 'str' and Strings are dynamically sized, so they are not scalar and stored entirely in the heap.
+    // Compound types like arrays can be composed of scalar types.
+    // In this case, compound types of scalar will push multiple scalar types onto the stack.
+    // The following example compares :
+    //   - a string that allocates data into the heap
+    //   - a string that pushes array of bytes onto the stack, and then gets a view of that data using the heap
+    // source: https://doc.rust-lang.org/std/str/fn.from_utf8.html
     use std::str;
-    // bytes pushed onto the stack
+    // hardcoding string to the static memory
+    // this string is hardcoded, so the compiler will store it within the binary itself
+    // at execution, the static_str pointer is pushed onto the stack and points to the location within
+    // the rodata of the binary that holds the value "hello"
+    let static_str: &str = "hello";
+    // allocating string to the heap
+    // this string is at first sight hardcoded, but we explicitly say to the Rust compiler to
+    // allocate it in the heap using "String::from".
+    // More precisely, the static string "hello" is first hardcoded in the static memory, but it will
+    // be accessed at runtime to allocate it in the heap.
+    // Then we create a pointer onto the stack that points to the heap space of the string value.
+    let heap_str: String = String::from("hello");
+    let heap_ref: &str = heap_str.as_str();
+    // push string onto the stack
+    // we initialize a compound type byte array to push chars onto the stack.
+    // Then using a literal str and "from_utf8" on the byte array, we explicitly say to the Rust
+    // compiler to create a pointer onto the stack that points to the byte array onto the stack and
+    // form a string with it.
+    // this function is one way to have a stack-allocated string:
     let x: [u8; 5] = [b'h', b'e', b'l', b'l', b'o']; // 'hello' byte array
-    // immutable str using the heap (5 bytes allocated) for each byte pushed onto the stack
     let stack_str: &str = str::from_utf8(&x).unwrap();
-    println!("view of the stack using the heap : '{}'", stack_str); // viewing the heap
+    println!("view of the static memory using the stack : '{}'", static_str); // viewing the heap
+    println!("view of the heap using the stack : '{}'", heap_ref); // viewing the heap
+    println!("view of the stack using the stack : '{}'", stack_str); // viewing the stack
 
     // HANDLE THE HEAP WITH MEMORY REQUESTS
     // The following expression explains what happens when you create a 'String' from a 'str'.
     // The double colon :: operator allows us to namespace the variable. This operator says that
-    // the memory must be requested from the memory allocator at runtime and that we need to
-    // return this memory to the allocator when we’re done with our String. This is done when the
-    // code goes out of the scope of this variable (eg: at the end of the function).
+    //   the memory must be requested from the memory allocator at runtime and that we need to
+    //   return this memory to the allocator when we’re done with our String. This is done when the
+    //   code goes out of the scope of this variable (eg: at the end of the function).
     // This kind of string can be mutated afterward, even if it is less efficient than the literals.
     // The stack view remains the same in the heap, but we use another location in the heap to
     // allocate an extended String :
+    // MORE INFORMATION ABOUT OWNERSHIP IN ../ownership/main.rs
     let immutable_str: &str = "hello";
-    let mut s = String::from(immutable_str); // double colon :: requests memory at runtime to be owned in this scope
+    let mut s = String::from(immutable_str);
     s.push_str(", world !"); // appends a literal to a String.
-    println!("Mutated String view of the stack : '{}'", s); // but the stack view remains the same
-    println!("Stack view didn't changed : '{}'", immutable_str);
+    println!("Mutated String view of the static memory : '{}'", s); // but the static data remains the same
+    println!("Static data didn't changed : '{}'", immutable_str);
 
     // HEAP COPY
     // The following expression explains what happens when you copy a 'String'.
-    // Remember that a String is made of 3 parts : a pointer, a length and a capacity.
+    // Remember that a String is made of 3 parts : a pointer, a length and a capacity stored onto the stack.
     // In this example, the pointer, the length and the capacity are copied.
-    // It means that the pointers of 's1' and 's2' are the same, so they point to the same location
-    // in the heap.
-    // THE DATA ITSELF IS NOT COPIED !!!
-    // In other words, 's1' and 's2' are 2 different objects on top of the stack
-    // ('s2' on top of 's1'), but point to the same data in the heap :
+    // It means that 's1' and 's2' are two different objects onto the stack that
+    // point to the same location in the heap :
     //   - address_s1 = address_s2
     //   - length_s1 = length_s2
     //   - capacity_s1 = capacity_s2
-    //   - s1 != s2 on the stack !
+    //   - s1 != s2 onto the stack !
+    // THE DATA ITSELF IS NOT COPIED !!!
     let s1 = String::from("hello");
     let s2 = s1;
     // SO THERE IS A PROBLEM :
     // When Rust will call the 'drop' function when 's1' and 's2' are getting out of scope,
     // Rust will try to free the same memory location twice.
     // Therefore, Rust implements a security that invalidate 's1' after 'let s2 = s1;', by
-    // implementing the feature 'copy' to heap-based variables.
+    // implementing the feature 'copy'.
     // In other words, Rust :
     //   - use 'copy' from 's1' to 's2'
     //   - invalidates 's1' in this scope
@@ -75,8 +102,7 @@ fn main() {
     //println!("{s1} world!"); // does not compile because s1 was invalidated (moved) by Rust
 
     // CLONING
-    // to deeply copy the heap data of the String, not just the stack data, we can use a
-    // method called "clone".
+    // to deeply copy the heap data of the String, we can use a method called "clone".
     // In this example, the heap data DOES get copied.
     // It means that a new pointer is created for 's2', and its length and capacity are inherited
     // from 's1'.
@@ -109,6 +135,7 @@ fn main() {
     this_fn_takes_ownership(s); // 's' is moved into the function ...
     // ... and 's' is no longer available in this scope : 's' was moved.
     //println!("{s}"); // So this statement will provoke a compile-time error
+    // let's do the same with a scalar type :
     let x = 5;
     this_fn_makes_copy(x); // 'x' IS NOT moved into this function, but is copied into the function,
     // because i32 has not the 'drop' trait (scalar type).
@@ -166,7 +193,7 @@ fn main() {
     //   1. Since we have to modify the string, the string MUST BE mutable
     //   2. String we use borrowing, the reference MUST BE mutable
     let mut s :String = String::from("hello");
-    modify(&mut s);
+    modify(&mut s); // here &mut is the mutable reference of the mutable variable s
     println!("The string was modified using its reference : {s}");
 
     // WARNING : a mutable reference can be held by an immutable variable.
