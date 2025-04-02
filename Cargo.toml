@@ -28,5 +28,10 @@ path = "src/tuto/structures/main.rs"
 [[bin]]
 name = "enumerations"
 path = "src/tuto/enumerations/main.rs"
+[[bin]]
+name = "rest-api-axum"
+path = "src/api/rest/axum/main.rs"
 
 [dependencies]
+axum = "0.8.3"
+tokio = { version = "1.44.1", features = ["full"] }
